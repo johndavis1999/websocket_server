@@ -61,6 +61,37 @@ app.post('/test-event', (req, res) => {
   }
 });
 
+app.post('/emit', (req, res) => {
+  console.log('Request body:', req.body); // Depuración
+
+  const { channel, event, data } = req.body;
+
+  // Validación de los campos necesarios
+  if (!channel || !event || !data || !Array.isArray(data)) {
+    return res.status(400).json({ error: 'Todos los campos (channel, event, data) son requeridos, y data debe ser un array' });
+  }
+
+  try {
+    // Emitir el evento al canal especificado con los datos del array
+    data.forEach((notification) => {
+      const { titulo, message, url } = notification;
+
+      // Validación adicional para los datos de cada notificación
+      if (!titulo || !message || !url) {
+        throw new Error('Cada notificación debe tener titulo, message y url');
+      }
+
+      // Emitir el evento con los datos de la notificación
+      io.to(channel).emit(event, { titulo, message, url });
+    });
+
+    res.status(200).json({ message: `Evento '${event}' enviado al canal '${channel}'` });
+  } catch (error) {
+    console.error('Error al emitir evento:', error.message);
+    res.status(400).json({ error: error.message });
+  }
+});
+
 // Evento cuando un cliente se conecta
 io.on('connection', (socket) => {
   console.log(`Nuevo cliente conectado: ${socket.id}`);
