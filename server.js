@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 const express = require('express');
 const http = require('http');
 const socketIo = require('socket.io');
@@ -124,8 +126,9 @@ io.on('connection', (socket) => {
 });
 
 // Configurar el puerto del servidor
-const PORT = process.env.PORT || 3001;
-const HOST = '192.168.31.99'; // Reemplaza con tu IP local si es necesario
+const PORT = process.env.PORT || 3000; // Si no está en .env, usa 3000 por defecto
+const HOST = process.env.HOST || '127.0.0.1'; // Si no está en .env, usa localhost por defecto
+
 server.listen(PORT, HOST, () => {
-  console.log(`Servidor WebSocket ejecutándose en http://${HOST}:${PORT}`);
+  console.log(`Servidor ejecutándose en http://${HOST}:${PORT}`);
 });
